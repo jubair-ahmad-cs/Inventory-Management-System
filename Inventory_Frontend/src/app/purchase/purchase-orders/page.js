@@ -75,7 +75,7 @@ export default function PurchaseOrdersTable() {
       newOrder.productName,
       newOrder.quantity,
       newOrder.totalAmount,
-      newOrder.status
+      newOrder.status || "Pending"
     );
     setRows([...rows, newRow]);
   };
@@ -108,11 +108,19 @@ export default function PurchaseOrdersTable() {
     setPage(newPage - 1);
   };
 
-  const filteredRows = rows.filter(row =>
-    row.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.supplierName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    row.productName.toLowerCase().includes(searchTerm.toLowerCase())
+const filteredRows = rows.filter((row) => {
+  const search = searchTerm.toLowerCase();
+
+  const orderId = row.orderId?.toString().toLowerCase() || "";
+  const supplierName = row.supplierName?.toLowerCase() || "";
+  const productName = row.productName?.toLowerCase() || "";
+
+  return (
+    orderId.includes(search) ||
+    supplierName.includes(search) ||
+    productName.includes(search)
   );
+});
 
   const currentData = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
@@ -167,64 +175,90 @@ export default function PurchaseOrdersTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {currentData.map((row) => (
-                <TableRow key={row.si} sx={{ '&:hover': { backgroundColor: '#f5f5f5' } }}>
-                  <TableCell>{row.si}</TableCell>
-                  <TableCell align="left">
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1976d2' }}>
-                      {row.orderId}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="left">
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {row.productName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="left">
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {row.quantity}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="left">{row.orderDate}</TableCell>
-                  <TableCell align="left">
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {row.supplierName}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="left">₹{row.totalAmount.toLocaleString()}</TableCell>
-                  <TableCell align="left">
-                    <Box className={`hrms-badge ${row.status === "Delivered" ? "hrms-badge-success" : row.status === "Pending" ? "hrms-badge-warning" : "hrms-badge-info"}`}>
-                      {row.status}
-                    </Box>
-                  </TableCell>
-                  <TableCell align="left">
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleView(row)}
-                          sx={{ color: '#1976d2' }}
-                        >
-                          <VisibilityOutlined />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEdit(row)}
-                          sx={{ color: '#000' }}
-                        >
-                          <EditOutlined />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleShowDelete(row.orderId)}
-                          sx={{ color: '#f44336' }}
-                        >
-                          <DeleteOutlined />
-                        </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
+  {currentData.map((row) => (
+    <TableRow
+      key={row.si}
+      sx={{ "&:hover": { backgroundColor: "#f5f5f5" } }}
+    >
+      <TableCell>{row.si}</TableCell>
+
+      <TableCell align="left">
+        <Typography
+          variant="subtitle2"
+          sx={{ fontWeight: 600, color: "#1976d2" }}
+        >
+          {row.orderId}
+        </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          {row.productName}
+        </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          {row.quantity}
+        </Typography>
+      </TableCell>
+
+      <TableCell align="left">{row.orderDate}</TableCell>
+
+      <TableCell align="left">
+        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+          {row.supplierName}
+        </Typography>
+      </TableCell>
+
+      <TableCell align="left">
+        ₹{Number(row.totalAmount || 0).toLocaleString("en-IN")}
+      </TableCell>
+
+      <TableCell align="left">
+        <Box
+          className={`hrms-badge ${
+            row.status === "Delivered"
+              ? "hrms-badge-success"
+              : row.status === "Pending"
+              ? "hrms-badge-warning"
+              : "hrms-badge-info"
+          }`}
+        >
+          {row.status}
+        </Box>
+      </TableCell>
+
+      <TableCell align="left">
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <IconButton
+            size="small"
+            onClick={() => handleView(row)}
+            sx={{ color: "#1976d2" }}
+          >
+            <VisibilityOutlined />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            onClick={() => handleEdit(row)}
+            sx={{ color: "#000" }}
+          >
+            <EditOutlined />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            onClick={() => handleShowDelete(row.orderId)}
+            sx={{ color: "#f44336" }}
+          >
+            <DeleteOutlined />
+          </IconButton>
+        </Box>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
           </Table>
         </Box>
         

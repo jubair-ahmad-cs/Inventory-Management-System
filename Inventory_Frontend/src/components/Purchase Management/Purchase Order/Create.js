@@ -59,7 +59,10 @@ const CreatePurchaseOrder = ({ handleClose, handleCreate }) => {
       alert('Please fill all required fields');
       return;
     }
-    handleCreate(formData);
+    handleCreate({
+  ...formData,
+  orderId: `PO${String(Date.now()).slice(-3)}`
+});
     handleClose();
   };
 
